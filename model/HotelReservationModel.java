@@ -242,6 +242,25 @@ public class HotelReservationModel {
 		return temp;
 	}
 
+	/**
+	 * Returns List of booked dates Regardless of User or type
+	 * @param startDate the starting date of booking
+	 * @param endDate the Ending Date of the booking
+	 * @return
+	 */
+	public String returnListOfBookedRoomsOnDate(LocalDate startDate, LocalDate endDate)
+	{
+		String available = "Nothing!";
+		for (int i = 0; i < rooms.length; i++) {
+			if (!rooms[i].isAvailableForRange(startDate, endDate))
+			{
+				if (i == 0) available = "";
+				available += rooms[i].getRoomNumber() + "\n";
+			}
+		}
+		return available;
+	}
+
 	public void managerWrite(String filename){
 		try{
 			File file = new File(filename);
