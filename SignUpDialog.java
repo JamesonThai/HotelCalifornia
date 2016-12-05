@@ -33,16 +33,19 @@ public class SignUpDialog extends JDialog{
 		this.add(panel);
 		this.pack();
 		signUp.addActionListener(event->{
-			int i = model.signUpGuest(nameTextField.getText());
-			if(i!=-1){
-				JOptionPane.showMessageDialog(this, "Your signed up.Your user id is "+ i);
-				setVisible(false);
-				owner.setVisible(false);
-				owner.getOwner().setVisible(true);
-			}else{
-				JOptionPane.showMessageDialog(this, "Error signing up");
-				setVisible(true);
-			}
+			String name = nameTextField.getText();
+			if(!name.equals("")){
+				int i = model.signUpGuest(nameTextField.getText());
+				if(i!=-1){
+					JOptionPane.showMessageDialog(this, "Your signed up.Your user id is "+ i);
+					setVisible(false);
+					owner.setVisible(false);
+					owner.getOwner().setVisible(true);
+				}else{
+					JOptionPane.showMessageDialog(this, "Error signing up");
+					setVisible(true);
+				}
+			}else JOptionPane.showMessageDialog(this, "Please enter a name");
 				
 		});
 		

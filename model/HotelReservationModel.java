@@ -15,6 +15,7 @@ import java.util.Scanner;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 /**
  * Main model that handles all reservations This model keeps track of rooms,
  * guests and all reservation in them Acts as a system addReservation,
@@ -92,6 +93,14 @@ public class HotelReservationModel {
 		}
 	}
 
+	public boolean userExists(String name, int id) {
+		Guest g = new Guest(name, id);
+		if (guests.contains(g))
+			return true;
+		else
+			return false;
+	}
+
 	// return username of currentUser
 	public String currentUser() {
 		return currentUser.getUsername();
@@ -132,25 +141,21 @@ public class HotelReservationModel {
 
 	// reserve room using roomNumber and checkin checkout date provided
 	public boolean reserveRoom(String roomNumber, LocalDate date1, LocalDate date2) {
-		System.out.println(roomNumber);
 		boolean result = true;
 		TYPE type = null;
 		int number = 0;
 
-		String roomType = roomNumber.substring(0,1);
-		
+		String roomType = roomNumber.substring(0, 1);
+
 		// set room type LUXURY vs ECO
-		
-		if (roomType.equals("L")){
+
+		if (roomType.equals("L")) {
 			type = TYPE.LUXURY;
 			System.out.println("lux");
-		}
-		else
+		} else
 			type = TYPE.ECO;
-		System.out.println(type.toString().length());
 		number = Integer.parseInt(roomNumber.substring(type.toString().length()));
-		System.out.println(number);
-	
+
 		// create a reservation
 		Reservation r = new Reservation(date1, date2, type, number, currentUser.getUsername());
 
@@ -159,10 +164,10 @@ public class HotelReservationModel {
 		if (!result)
 			return result;
 
-		//if (type == TYPE.LUXURY)
-		//	result = rooms[number - 1].addReservation(r);
-	//	else
-			result = rooms[number - 1].addReservation(r);
+		// if (type == TYPE.LUXURY)
+		// result = rooms[number - 1].addReservation(r);
+		// else
+		result = rooms[number - 1].addReservation(r);
 
 		// add this reservation of this user for this session to receipt
 		if (result)
@@ -172,10 +177,15 @@ public class HotelReservationModel {
 
 	/**
 	 * Canceling the reservation
-	 * @param type Room Type
-	 * @param number Room Number
-	 * @param date1 Checkin Date
-	 * @param date2 Checkout Date
+	 * 
+	 * @param type
+	 *            Room Type
+	 * @param number
+	 *            Room Number
+	 * @param date1
+	 *            Checkin Date
+	 * @param date2
+	 *            Checkout Date
 	 */
 	public void cancelReservation(String type, int number, LocalDate date1, LocalDate date2) {
 		TYPE t = null;
@@ -244,92 +254,108 @@ public class HotelReservationModel {
 
 	/**
 	 * Returns List of booked dates Regardless of User or type
-	 * @param startDate the starting date of booking
-	 * @param endDate the Ending Date of the booking
+	 * 
+	 * @param startDate
+	 *            the starting date of booking
+	 * @param endDate
+	 *            the Ending Date of the booking
 	 * @return
 	 */
-	public String returnListOfBookedRoomsOnDate(LocalDate startDate, LocalDate endDate)
-	{
+	public String returnListOfBookedRoomsOnDate(LocalDate startDate, LocalDate endDate) {
 		String available = "Nothing!";
+		int count = 0;
 		for (int i = 0; i < rooms.length; i++) {
-			if (!rooms[i].isAvailableForRange(startDate, endDate))
-			{
-				if (i == 0) available = "";
-				available += rooms[i].getRoomNumber() + "\n";
+			if (!rooms[i].isAvailableForRange(startDate, endDate)) {
+				if (count == 0) {
+					available = "";
+					count++;
+				}
+				// follow hotel.getRoomInfo for user getting
+				/**
+				 * Edit Here
+				 */
+			available += rooms[i].getRoomNumber() + "\n" + rooms[i].getUserBookedRoom() + "\n";
 			}
 		}
 		return available;
 	}
 
-	public void managerWrite(String filename){
-		try{
+	public String getRoomInfo(String roomNumber) {
+		TYPE type = null;
+		int number = 0;
+		String roomType = roomNumber.substring(0, 1);
+		if (roomType.equals("L")) {
+			type = TYPE.LUXURY;
+			System.out.println("lux");
+		} else
+			type = TYPE.ECO;
+		number = Integer.parseInt(roomNumber.substring(type.toString().length()));
+		return rooms[number - 1].getRoomInfo();
+	}
+
+	public void managerWrite(String filename) {
+		try {
 			File file = new File(filename);
-			FileWriter writer = new FileWriter(file.getAbsoluteFile());
+			FileWriter writer = new FileWriter(file.getAbsoluteFile(), false);
 			BufferedWriter buffer = new BufferedWriter(writer);
-			//buffer.write("Customer list:\n");
-			for(int i = 0; i < guests.size(); i++){
-				buffer.write("User:" + guests.get(i).getUsername() +"\n");
+			for (int i = 0; i < guests.size(); i++) {
+				buffer.write("User:" + guests.get(i).getUsername() + "/" + guests.get(i).getId() + "\n");
 				String[] rsvp = guests.get(i).getUserReservationCompactList();
-				for(int j = 0; j < rsvp.length; j++){
+				for (int j = 0; j < rsvp.length; j++) {
 					buffer.write(rsvp[j]);
 				}
 			}
+
 			buffer.close();
-		}catch(IOException ex){
+		} catch (IOException ex) {
 			System.out.println("Error writing to file");
 		}
 	}
-	
-	public void read(String filename){
-		try{
+
+	public void read(String filename) {
+		try {
 			File file = new File(filename);
-			if(file.exists()){
+			if (file.exists()) {
 				Scanner in = new Scanner(file);
 				String line = "";
 				TYPE type = null;
-				while(in.hasNextLine()){
+				while (in.hasNextLine()) {
 					line = in.nextLine();
-					if(line.startsWith("User:")){
+					if (line.startsWith("User:")) {
+						this.signOutGuest();
 						String[] userLine = line.split(":");
-						this.signUpGuest(userLine[1]);
-					}else{
-						String[] rsvpInfo = line.split("/");//type, num, checkin, checkout
+						String[] userInfo = userLine[1].split("/");
+						if (!this.userExists(userInfo[0], Integer.parseInt(userInfo[1])))
+							this.signUpGuest(userInfo[0]);
+						else this.signInGuest(userInfo[0], Integer.parseInt(userInfo[1]));
+					} else if (!line.equals("") && currentUser != null) {
+						String[] rsvpInfo = line.split("/");// type, num,
+															// checkin, checkout
 						String[] checkInField = rsvpInfo[2].split("-");
-						String[] checkOutField = rsvpInfo[3].split("-");  
+						String[] checkOutField = rsvpInfo[3].split("-");
 						LocalDate checkIn = LocalDate.of(Integer.parseInt(checkInField[0]),
-													     Integer.parseInt(checkInField[1]),
-														 Integer.parseInt(checkInField[2]));
-						LocalDate checkOut = LocalDate.of(Integer.parseInt(checkOutField[0]), 
-														  Integer.parseInt(checkOutField[1]),
-														  Integer.parseInt(checkOutField[2]));
-						//check if expired
+								Integer.parseInt(checkInField[1]), Integer.parseInt(checkInField[2]));
+						LocalDate checkOut = LocalDate.of(Integer.parseInt(checkOutField[0]),
+								Integer.parseInt(checkOutField[1]), Integer.parseInt(checkOutField[2]));
+						// check if expired
+						String roomNumber = rsvpInfo[0] + rsvpInfo[1];
 						LocalDate expiredDate = LocalDate.now();
-						if(!checkIn.isBefore(expiredDate)){ //if not expired then add it
-							if(rsvpInfo[0].equals("LUXURY"))
-								type = TYPE.LUXURY;
-							else type = TYPE.ECO;
-							int num = Integer.parseInt(rsvpInfo[1]);
-							Reservation r = new Reservation(checkIn, checkOut, type, num, currentUser.getUsername());
-							currentUser.addReservation(r);
-							rooms[num-1].addReservation(r);
+						if (!checkIn.isBefore(expiredDate)) { // if not expired
+																// then add it
+							this.reserveRoom(roomNumber, checkIn, checkOut);
 						}
-						
+
 					}
-					
-				}	
+
+				}
+			} else {
+				System.out.println("This is the first run");
 			}
-			else{
-			System.out.println("This is the first run");
-			}
-		}catch(IOException ex){
+		} catch (IOException ex) {
 			System.out.println("Error opening file");
 		}
 	}
-	
-	
-	
-	
-	
+
 	// strategy for simpleReceipt
 	public static class SimpleReceipt implements GetReceiptStrategy {
 		@Override

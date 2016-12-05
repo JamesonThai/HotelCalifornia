@@ -81,9 +81,10 @@ public class CalendarModel{
 		//get other important dates
 		int firstDayOfMonth = cal.get(Calendar.DAY_OF_WEEK);
 		int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-		int weeksInMonth = cal.getActualMaximum(Calendar.WEEK_OF_MONTH);
-		
+	//	int weeksInMonth = cal.getActualMaximum(Calendar.WEEK_OF_MONTH);
+		int weeksInMonth = 6;
 		int day = 1;
+		//System.out.println(weeksInMonth);
 		rowData = new String[weeksInMonth*7];
 		for(int i = 0; i < weeksInMonth*7; i++){
 			if(i < firstDayOfMonth - 1){

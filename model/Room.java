@@ -42,6 +42,40 @@ public class Room {
 		return type.name()+number;
 	}
 	
+	public String getRoomInfo(){
+		String line = this.getRoomNumber()+"\n";
+		for(int i = 0; i < rsvp.size(); i++){
+			line+= rsvp.get(i).getInfoWithRoomNumberOmit();
+			line+= "\n";
+		}
+		return line;
+	}
+	
+	/**
+	 * Gets the user who booked this room at that date
+	 * @return username of person who booked that rooms
+	 */
+	public String getUserBookedRoom()
+	{
+		int count = 0;
+		String line = "";
+		ArrayList<String> previousUsers = new ArrayList<String>();
+		for(int i = 0; i < rsvp.size(); i++)
+		{
+			String s = rsvp.get(i).getUsername();
+			for (String t : previousUsers)
+			{
+				if (s.equals(t)) count++;
+			}
+			if (count == 0) 
+			{
+				previousUsers.add(s);
+				line += s + "\n";
+			}
+		}
+		return line;
+	}
+	
 	//add to room a reservation, only used it in HotelReservationModel alongside
 	// with guest.add
 	public boolean addReservation(Reservation re){

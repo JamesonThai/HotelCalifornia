@@ -36,12 +36,10 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 	private JTextArea roomInfo;
 	private JTextArea roomAvailability; 
 	private JTextArea roomReserved; 
-	private boolean isLuxury;
-	private LocalDate dateAfter;
-	
 	private JButton[] daybuttons;
 	private JLabel calendarLabel;
 	private boolean firstField;
+	private JLabel dayLabel;
 	
 	/**
 	 * Constructor of ManagerView
@@ -50,14 +48,13 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 	 */
 	public ManagerRsvpViewFrame(HotelReservationModel hotel, CalendarModel calendar) {
 		this.hotel = hotel;
+		calendar.attachListener(this);
 		this.cal = calendar;
 		
 		// month view panel: to be added to North of this frame
 		JPanel monthViewPanel = new JPanel();
 		// monthViewPanel's contents go here
 		
-		JButton CalendarPlaceHolder = new JButton("placeHolder");
-
 		//navigation
 		JButton pre = new JButton("<");
 		JButton next = new JButton(">");
@@ -65,23 +62,23 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 
 		LocalDate now = cal.getDateNow();
 		calendarLabel.setText(now.getMonth()+" "+now.getYear());
+		dayLabel = new JLabel(cal.getDateNow().toString());
 		
 		JPanel navigation = new JPanel();
 		navigation.add(pre);
 		navigation.add(calendarLabel);
 		navigation.add(next);
-		monthViewPanel.add(navigation, BorderLayout.NORTH);
+		navigation.add(dayLabel);
+		
 		
 		pre.addActionListener(event->{
 			cal.previousMonth();
-			updateCalendar();
-//			cal.update();
+			cal.update();
 		});
 		
 		next.addActionListener(event->{
 			cal.nextMonth();
-			updateCalendar();
-//			cal.update();
+			cal.update();
 		});
 		
 		// New check
@@ -94,8 +91,8 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 		String[] row = cal.getRowData();
 		
 		//set gridbad layout for buttonPanel to display button
-		buttonPanel.setLayout(new GridLayout(6, 8)); // was 6,7 before
-		
+		buttonPanel.setLayout(new GridLayout(7, 7)); // was 6,7 before
+													//jameson is 6,8
 		//set up buttons with title
 		String[] title = new String[]{"S","M","T","W","T","F","S"};
 		for(int i = 0; i < titleButtons.length; i++){
@@ -111,10 +108,12 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 			daybuttons[i].addActionListener(event->{
 				JButton chosenButton = (JButton) event.getSource();
 				if(!chosenButton.getText().equals("")){
-					int dayValue = Integer.parseInt(chosenButton.getText());
-					LocalDate currentMonthYear = cal.getRequestedDay();
-					dateClicked = LocalDate.of(currentMonthYear.getYear(), currentMonthYear.getMonthValue(), dayValue);
-					update(dateClicked);
+					if(chosenButton.getText().matches("^[0-9]*$")){
+						int dayValue = Integer.parseInt(chosenButton.getText());
+						LocalDate currentMonthYear = cal.getRequestedDay();
+						dateClicked = LocalDate.of(currentMonthYear.getYear(), currentMonthYear.getMonthValue(), dayValue);
+						cal.update();
+					}
 				}
 			});
 			
@@ -137,17 +136,25 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 		
 		JScrollPane scrollPane = new JScrollPane(roomAvailability);
 		JScrollPane scrollPane2 = new JScrollPane(roomReserved);
-		
+	
 		rmAvail.add(scrollPane);
 		rmReser.add(scrollPane2);		
 		textAreas.add(rmAvail);
 		textAreas.add(rmReser);
-			
-		monthViewPanel.add(buttonPanel);
-		monthViewPanel.add(textAreas);
 		
-		buttonPanel.setBounds(10,10, 600, 600);
-		textAreas.setBounds(650,10,500,500);
+		//set up month view panel
+		JPanel calendarPanel = new JPanel();
+		calendarPanel.setLayout(new BorderLayout());
+		calendarPanel.add(navigation, BorderLayout.NORTH);
+		calendarPanel.add(buttonPanel,BorderLayout.SOUTH);
+		monthViewPanel.setLayout(new BorderLayout());
+		//monthViewPanel.add(navigation, BorderLayout.NORTH);
+	//	monthViewPanel.add(buttonPanel);
+		monthViewPanel.add(calendarPanel,BorderLayout.WEST);
+		monthViewPanel.add(textAreas, BorderLayout.EAST);
+		
+	//	buttonPanel.setBounds(10,10, 600, 600);
+	//	textAreas.setBounds(650,10,500,500);
 		
 		// room view panel: to be added to South of this frame
 		JPanel roomViewPanel = new JPanel();
@@ -161,8 +168,14 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 		JButton[] roomButtons = new JButton[roomList.length];
 		for (int i = 0; i < roomButtons.length; i++) {
 			roomButtons[i] = new JButton(roomList[i]);
-			// add the button's action listener here
 			roomButtonPanel.add(roomButtons[i]);
+			roomButtons[i].addActionListener(event->{
+				JButton button = (JButton) event.getSource();
+				String roomNumber = button.getText();
+				String info = hotel.getRoomInfo(roomNumber);
+				roomInfo.setText(info);
+				repaint();
+			});
 		}
 		
 		// textArea to show Info of room
@@ -172,30 +185,42 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 		JScrollPane scrollPane3 = new JScrollPane(roomInfo);
 		roomInfoPanel.add(scrollPane3);
 		roomInfo.setEditable(false);
+		roomButtonPanel.setBorder(BorderFactory.createTitledBorder("Room View"));
+		roomInfoPanel.setBorder(BorderFactory.createTitledBorder("Room Info"));
+		
 		
 		// Setting layout
+		
 		roomViewPanel.add(roomButtonPanel, BorderLayout.WEST);
 		roomViewPanel.add(roomInfoPanel, BorderLayout.CENTER);
 		this.add(monthViewPanel, BorderLayout.NORTH);
 		this.add(roomViewPanel, BorderLayout.SOUTH);
 		this.setSize(1200, 600);
 		// COMENTED OUT PACK so it doesn't resize and cut out textAreas
-//		this.pack();
+		this.pack();
+		this.setResizable(false);
 		this.setVisible(true);
 	}
 
 
 	@Override
+	/**
+	 * Overriding the stateChanged event from changeListeners
+	 * @param e the event that affects the model
+	 */
 	public void stateChanged(ChangeEvent e) {
 		// TODO Auto-generated method stub
 		// Getting available room from checkInDate to CheckOut Date or are we just only checking for the current day
-		System.out.println("goT hERE");
 		String[] row = cal.getRowData();
 		for(int i = 0; i < daybuttons.length; i++){
 			daybuttons[i].setText(row[i]);
 		}
 		LocalDate current = cal.getRequestedDay();
 		calendarLabel.setText(current.getMonth() +" "+current.getYear());
+		if(dateClicked!=null){
+			dayLabel.setText(dateClicked.toString());
+			this.update(dateClicked);
+		}
 		repaint();
 	}
 
@@ -208,30 +233,14 @@ public class ManagerRsvpViewFrame extends JFrame implements ChangeListener {
 		String s = "";
 		roomAvailability.setText("");
 		roomReserved.setText("");
+		
 		LocalDate dateAfter = LocalDate.of(dateClicked.getYear(), dateClicked.getMonthValue(),dateClicked.getDayOfMonth());
-		s = dateChosen.toString() + "\n"+ hotel.getAvailableRoom(dateClicked, dateAfter, true)+ "\n"+hotel.getAvailableRoom(dateClicked, dateAfter, false);
+		s =  hotel.getAvailableRoom(dateClicked, dateAfter, true)+ "\n"+hotel.getAvailableRoom(dateClicked, dateAfter, false);
 		roomAvailability.setText(s);
 		s = "Reserved Rooms" + "\n" + dateChosen.toString();
-		s = dateChosen.toString() + "\n"+ hotel.returnListOfBookedRoomsOnDate(dateClicked, dateAfter);
+		s = hotel.returnListOfBookedRoomsOnDate(dateClicked, dateAfter);
 		roomReserved.setText(s);
 		dateClicked = dateChosen;
 	}
 	
-	/**
-	 * Visually updates the calendar when clicking next or previous
-	 */
-	public void updateCalendar()
-	{
-		String[] row = cal.getRowData();
-		for(int i = 0; i < daybuttons.length; i++){
-			daybuttons[i].setText(row[i]);
-		}
-		LocalDate current = cal.getRequestedDay();
-		calendarLabel.setText(current.getMonth() +" "+current.getYear());
-		repaint();
-	}
-
-	public void setField(boolean firstField){
-		this.firstField = firstField;
-	}
 }

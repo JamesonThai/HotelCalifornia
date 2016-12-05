@@ -114,6 +114,8 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		//confirm button
 		JButton confirm = new JButton("Confirm");
 		confirm.addActionListener(event->{
+			if (checkInField.getText() == null || checkOutField.getText() == null)
+			{
 			boolean result = hotel.reserveRoom(roomChoiceField.getText().toUpperCase(), checkInDate, checkOutDate);
 			if(result){
 				JOptionPane.showMessageDialog(this, "Room "+ roomChoiceField.getText().toUpperCase()+" is reserved successfully.");
@@ -121,6 +123,7 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 			}
 			else{
 				JOptionPane.showMessageDialog(this, "Room already reserved");
+			}
 			}
 		});
 		
@@ -133,7 +136,7 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		//done button
 		JButton done = new JButton("Done");
 		done.addActionListener(event->{
-			Object[] options = {"Simple", "Comprehensive"};
+			Object[] options = {"Comprehensive","Simple"};
 			int n =  JOptionPane.showOptionDialog(this, "Simple or Comprehensive", "Print Receipt", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		
 			//simple choice
@@ -189,7 +192,7 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		}
 		
 		if(firstField && checkInDate.isBefore(calendar.getDateNow())){
-			JOptionPane.showMessageDialog(this, "Please pick a day from or after to day");
+			JOptionPane.showMessageDialog(this, "Please pick a future or current date");
 			calendarChoser.setVisible(true);
 		}else if(!firstField && Reservation.getLengthOfStay(checkInDate, dateChosen) >=60){
 			JOptionPane.showMessageDialog(this, "The maximum lenght of stay is 60");

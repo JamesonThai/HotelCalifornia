@@ -21,6 +21,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import model.CalendarModel;
@@ -32,7 +33,7 @@ public class ManagerScene<Reservation> extends JFrame {
 	private ManagerRsvpViewFrame viewFrame;
 	static GregorianCalendar cal = new GregorianCalendar();
 	private CalendarModel calendarModel;
-	
+		
 	public ManagerScene(HotelReservationModel hotel) {
 		this.setTitle("Manager System");
 		this.hotel = hotel;
@@ -43,11 +44,13 @@ public class ManagerScene<Reservation> extends JFrame {
 		
 		calendarModel = new CalendarModel();
 		load.addActionListener(event -> {
-			hotel.read("rsvp.txt");
+				hotel.read("rsvp.txt");
+				JOptionPane.showMessageDialog(this, "Reservation is loaded");
 		});
 
 		quit.addActionListener(event -> {
 			hotel.managerWrite("rsvp.txt");
+			System.exit(0);
 		});
 
 		view.addActionListener(event -> {

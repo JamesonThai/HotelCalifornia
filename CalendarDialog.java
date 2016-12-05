@@ -70,7 +70,7 @@ public class CalendarDialog extends JDialog implements ChangeListener {
 		String[] row = calendar.getRowData();
 		
 		//set gridbad layout for buttonPanel to display button
-		buttonPanel.setLayout(new GridLayout(6, 7));
+		buttonPanel.setLayout(new GridLayout(7, 7));
 		
 		//set up buttons with title
 		String[] title = new String[]{"S","M","T","W","T","F","S"};

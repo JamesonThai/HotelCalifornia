@@ -54,7 +54,7 @@ public class SignInDialog extends JDialog{
 		signIn.addActionListener(event->{
 			String name = nameField.getText();
 			String num = idField.getText();
-			if(name.isEmpty() || !num.contains("^[0-9]*$")){
+			if(name.isEmpty() || !num.matches("^[0-9]*$") || num.equals("")){
 				JOptionPane.showMessageDialog(this, "Please enter valid name and Id");
 			}else{
 				int id = Integer.parseInt(idField.getText());

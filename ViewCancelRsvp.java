@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -75,19 +76,29 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String s = cancelInput.getText();
-				cancelInput.setText("");
-				int a = Integer.parseInt(s) - 1;
-				String line = hotel.returnListOfBookedRooms().get(a);
-				String[] t = line.split(",");
-				System.out.println(t[0]);
-				String[] CID = t[2].split("-");
-				String[] COD = t[3].split("-");
-				checkInDate = LocalDate.of(Integer.parseInt(CID[0]), Integer.parseInt(CID[1]),
-						Integer.parseInt(CID[2]));
-				checkOutDate = LocalDate.of(Integer.parseInt(COD[0]), Integer.parseInt(COD[1]),
-						Integer.parseInt(COD[2]));
-				hotel.cancelReservation(t[0], Integer.parseInt(t[1]), checkInDate, checkOutDate);
-				hotel.update();
+				if(!s.matches("^[0-9]*$") || s.equals("")){
+					JOptionPane.showMessageDialog(ViewCancelRsvp.this, "Please enter a valid number");
+				}
+				else{
+					cancelInput.setText("");
+					int a = Integer.parseInt(s) - 1;
+					if(a >= 1 && a <=  hotel.returnListOfBookedRooms().size()){
+						String line = hotel.returnListOfBookedRooms().get(a);
+						String[] t = line.split(",");
+						System.out.println(t[0]);
+						String[] CID = t[2].split("-");
+						String[] COD = t[3].split("-");
+						checkInDate = LocalDate.of(Integer.parseInt(CID[0]), Integer.parseInt(CID[1]),
+								Integer.parseInt(CID[2]));
+						checkOutDate = LocalDate.of(Integer.parseInt(COD[0]), Integer.parseInt(COD[1]),
+								Integer.parseInt(COD[2]));
+						hotel.cancelReservation(t[0], Integer.parseInt(t[1]), checkInDate, checkOutDate);
+						hotel.update();
+					}else{
+						JOptionPane.showMessageDialog(ViewCancelRsvp.this, "Please enter a valid number that is less than "
+								+ hotel.returnListOfBookedRooms().size());
+					}
+				}
 			}
 
 		});

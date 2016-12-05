@@ -77,6 +77,14 @@ public class Reservation implements Comparable<Reservation>{
 		return line;
 	}
 	
+	public String getInfoWithRoomNumberOmit(){
+		String line = "";
+		line+= "Checkin "+checkin.toString()+"\n";
+		line+= "Checkout "+checkout.toString()+"\n";
+		line+= "Guest: "+username+"\n";
+		return line;
+	}
+	
 	@Override //used to sort reservation base on checkin date
 	public int compareTo(Reservation o) {
 		return checkin.compareTo(o.checkin);
