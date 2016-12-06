@@ -87,11 +87,13 @@ public class CalendarDialog extends JDialog implements ChangeListener {
 			daybuttons[i].addActionListener(event->{
 				JButton chosenButton = (JButton) event.getSource();
 				if(!chosenButton.getText().equals("")){
+					if(chosenButton.getText().matches("^[0-9]*$")){
 					int dayValue = Integer.parseInt(chosenButton.getText());
 					LocalDate currentMonthYear = calendar.getRequestedDay();
 					dateChosen = LocalDate.of(currentMonthYear.getYear(), currentMonthYear.getMonthValue(), dayValue);
 					this.setVisible(false);
 					owner.update(dateChosen,firstField);	
+					}
 				}
 			});
 			

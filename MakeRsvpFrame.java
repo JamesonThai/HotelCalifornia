@@ -118,7 +118,7 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		//confirm button
 		JButton confirm = new JButton("Confirm");
 		confirm.addActionListener(event->{
-			System.out.println("confirmed");
+//			System.out.println("confirmed");
 			if (checkInField.getText() == null || checkOutField.getText() == null 
 					|| !roomChoiceField.getText().matches("^[0-9]*$") || roomChoiceField.getText().equals("") ){
 				JOptionPane.showMessageDialog(MakeRsvpFrame.this, "Please enter valid input");
@@ -190,6 +190,7 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		reservationPanel.add(userChoicePanel, BorderLayout.EAST);
 		this.add(reservationPanel, BorderLayout.SOUTH);
 		this.setVisible(true);
+		this.setResizable(false);
 		this.pack();	
 	}
 	
