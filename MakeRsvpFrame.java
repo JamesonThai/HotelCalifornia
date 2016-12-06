@@ -62,7 +62,9 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		checkOutButton.addActionListener(getDateFromCalendar(false));
 		
 		checkInField = new JTextField(10);
+		checkInField.setEditable(false);
 	    checkOutField = new JTextField(10);
+	    checkOutField.setEditable(false);
 		
 		JLabel roomTypeLabel = new JLabel("Room Type");
 		JButton luxuryButton = new JButton("$200");
@@ -106,24 +108,36 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 		JLabel roomInfoLabel = new JLabel("Available rooms");
 		availableRoomArea = new JTextArea(20,20);
 		availableRoomArea.setLineWrap(true);
+		availableRoomArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(availableRoomArea);
 	
 		JLabel roomChoiceLabel = new JLabel("Enter room number to reserve");
 		roomChoiceField = new JTextField(10);
+		roomChoiceField.setEditable(false);
 	
 		//confirm button
 		JButton confirm = new JButton("Confirm");
 		confirm.addActionListener(event->{
-			if (checkInField.getText() == null || checkOutField.getText() == null)
-			{
-			boolean result = hotel.reserveRoom(roomChoiceField.getText().toUpperCase(), checkInDate, checkOutDate);
-			if(result){
-				JOptionPane.showMessageDialog(this, "Room "+ roomChoiceField.getText().toUpperCase()+" is reserved successfully.");
-				hotel.update(); //update model and let changeListener modify the view
+			System.out.println("confirmed");
+			if (checkInField.getText() == null || checkOutField.getText() == null 
+					|| !roomChoiceField.getText().matches("^[0-9]*$") || roomChoiceField.getText().equals("") ){
+				JOptionPane.showMessageDialog(MakeRsvpFrame.this, "Please enter valid input");
 			}
-			else{
-				JOptionPane.showMessageDialog(this, "Room already reserved");
-			}
+			else
+			{	String roomChoice = "";
+				if(isLuxury){
+					roomChoice = "LUXURY" + roomChoiceField.getText();
+				}else{
+					roomChoice = "ECO" + roomChoiceField.getText();
+				}
+				boolean result = hotel.reserveRoom(roomChoice, checkInDate, checkOutDate);
+				if(result){
+					JOptionPane.showMessageDialog(this, "Room "+ roomChoiceField.getText().toUpperCase()+" is reserved successfully.");
+					hotel.update(); //update model and let changeListener modify the view
+				}
+				else{
+					JOptionPane.showMessageDialog(this, "Room already reserved");
+				}
 			}
 		});
 		
@@ -224,6 +238,7 @@ public class MakeRsvpFrame extends JFrame implements ChangeListener {
 				String list = hotel.getAvailableRoom(checkInDate, checkOutDate, isluxury);
 				isLuxury = isluxury;
 				availableRoomArea.setText(list);
+				roomChoiceField.setEditable(true);
 			}
 			
 		};

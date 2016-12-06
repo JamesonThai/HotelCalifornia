@@ -82,7 +82,7 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 				else{
 					cancelInput.setText("");
 					int a = Integer.parseInt(s) - 1;
-					if(a >= 1 && a <=  hotel.returnListOfBookedRooms().size()){
+					if(a >= 0 && a <=  hotel.returnListOfBookedRooms().size()){
 						String line = hotel.returnListOfBookedRooms().get(a);
 						String[] t = line.split(",");
 						System.out.println(t[0]);
