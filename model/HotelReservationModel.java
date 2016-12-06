@@ -74,6 +74,7 @@ public class HotelReservationModel {
 	// look up guest in guest list using name and id provided
 	// if found assign guest to current user, renew receipts
 	public boolean signInGuest(String name, int id) {
+		currentUser = null;
 		Guest g = new Guest(name, id);
 		int i = guests.indexOf(g);
 		if (i == -1)
@@ -113,10 +114,12 @@ public class HotelReservationModel {
 
 	// print the receipt based on the strategy set before hand
 	public String printReceipt() {
-		if (strategy == null)
-			return "";
-		else
-			return strategy.getReceipt(currentUser, receipts);
+		if(currentUser!=null){
+			if (strategy == null)
+				return "";
+			else
+				return strategy.getReceipt(currentUser, receipts);
+		}else return "";
 	}
 
 	// return available rooms in form of strings
@@ -151,11 +154,11 @@ public class HotelReservationModel {
 
 		if (roomType.equals("L")) {
 			type = TYPE.LUXURY;
-			System.out.println("lux");
 		} else
 			type = TYPE.ECO;
 		number = Integer.parseInt(roomNumber.substring(type.toString().length()));
-
+		if(type == TYPE.LUXURY && (number < 0 || number >9)) return false;
+		if(type == TYPE.ECO && (number < 10 || number >19)) return false;
 		// create a reservation
 		Reservation r = new Reservation(date1, date2, type, number, currentUser.getUsername());
 
@@ -322,13 +325,17 @@ public class HotelReservationModel {
 				while (in.hasNextLine()) {
 					line = in.nextLine();
 					if (line.startsWith("User:")) {
+						System.out.println("Reading "+line);
 						this.signOutGuest();
 						String[] userLine = line.split(":");
 						String[] userInfo = userLine[1].split("/");
-						if (!this.userExists(userInfo[0], Integer.parseInt(userInfo[1])))
-							this.signUpGuest(userInfo[0]);
-						else this.signInGuest(userInfo[0], Integer.parseInt(userInfo[1]));
+						String guestname = userInfo[0];
+						int guestId = Integer.parseInt(userInfo[1]);
+						if (!this.userExists(guestname, guestId))
+							System.out.println("sign up " + this.signUpGuest(guestname));
+						else System.out.println("sign in " + this.signInGuest(guestname, guestId));
 					} else if (!line.equals("") && currentUser != null) {
+						System.out.println("Processing "+line);
 						String[] rsvpInfo = line.split("/");// type, num,
 															// checkin, checkout
 						String[] checkInField = rsvpInfo[2].split("-");
@@ -340,9 +347,10 @@ public class HotelReservationModel {
 						// check if expired
 						String roomNumber = rsvpInfo[0] + rsvpInfo[1];
 						LocalDate expiredDate = LocalDate.now();
+						System.out.println(roomNumber);
 						if (!checkIn.isBefore(expiredDate)) { // if not expired
 																// then add it
-							this.reserveRoom(roomNumber, checkIn, checkOut);
+							System.out.println("reserve this "+this.reserveRoom(roomNumber, checkIn, checkOut));
 						}
 
 					}
