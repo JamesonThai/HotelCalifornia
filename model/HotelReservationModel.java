@@ -1,6 +1,6 @@
 /**
- * HotelReservationModel.java: hotel model for the project, handling all reserving and cancelling
- * Author: Kim Pham
+ * HotelReservationModel.java: hotel model for the project, handling all reserving and canceling
+ * Author: Kim Pham, Jameson Thai
  */
 
 package model;
@@ -39,7 +39,9 @@ public class HotelReservationModel {
 	// listener to register view
 	ArrayList<ChangeListener> listeners;
 
-	// create 10 LUXURY and 10 ECONOMIC
+	/**
+	 * Constructor that makes 10 Luxury and 10 Economic rooms
+	 */
 	public HotelReservationModel() {
 		rooms = new Room[20];
 		for (int i = 0; i < 20; i++) {
@@ -53,11 +55,12 @@ public class HotelReservationModel {
 		listeners = new ArrayList<>();
 	}
 
-	// create a new guest with provided name, add to guest list
-	// sign in guest after guest sign up
-	// if sign in successfully, return the id (so that view can notify guest
-	// their id)
-	// id automatically assigned using order of sign up for now (1,2,3,4..)
+	/**
+	 * Making a new Guest with name provided then add to guest list
+	 * Sign in guest after signing up guest
+	 * @param name Name of the Guest to be assigned ID
+	 * @return id if sign in was successful
+	 */
 	public int signUpGuest(String name) {
 
 		Guest g = new Guest(name, guests.size() + 1);
@@ -71,8 +74,12 @@ public class HotelReservationModel {
 			return -1;
 	}
 
-	// look up guest in guest list using name and id provided
-	// if found assign guest to current user, renew receipts
+	/**
+	 * Looks up guest in the guest List using name and id
+	 * @param name Name of the User
+	 * @param id Password/ID of the user
+	 * @return true if the guest exist and id matches, otherwise false
+	 */
 	public boolean signInGuest(String name, int id) {
 		currentUser = null;
 		Guest g = new Guest(name, id);
@@ -86,7 +93,9 @@ public class HotelReservationModel {
 		}
 	}
 
-	// sign out guest, set currentUser to null and renew receipt
+	/**
+	 * Sign out the guest, set currentUser to null and renew the receipt
+	 */
 	public void signOutGuest() {
 		if (currentUser != null) {
 			currentUser = null;
@@ -94,6 +103,12 @@ public class HotelReservationModel {
 		}
 	}
 
+	/**
+	 * Checks if the user exists already
+	 * @param name Name of the Guest
+	 * @param id Password of the Guest
+	 * @return true if user already exists, false if not
+	 */
 	public boolean userExists(String name, int id) {
 		Guest g = new Guest(name, id);
 		if (guests.contains(g))
@@ -102,17 +117,26 @@ public class HotelReservationModel {
 			return false;
 	}
 
-	// return username of currentUser
+	/**
+	 * Gets username of the currentUser
+	 * @return username of current User
+	 */
 	public String currentUser() {
 		return currentUser.getUsername();
 	}
 
-	// set the strategy for printing receipt(simple or comprehensive)
+	/**
+	 * Setting strategy for printing receipt(simple or comprehensive)
+	 * @param s type of strategy 
+	 */
 	public void setGetReceipt(GetReceiptStrategy s) {
 		strategy = s;
 	}
 
-	// print the receipt based on the strategy set before hand
+	/**
+	 * print the receipt based on strategy set beforehand
+	 * @return the receipt based on the strategy
+	 */
 	public String printReceipt() {
 		if(currentUser!=null){
 			if (strategy == null)
@@ -122,8 +146,13 @@ public class HotelReservationModel {
 		}else return "";
 	}
 
-	// return available rooms in form of strings
-	// Ex: LUXURY5, ECO1...
+	/**
+	 * Returns available rooms in the form of string
+	 * @param date1 CheckInDate
+	 * @param date2 CheckOutDate
+	 * @param type roomType
+	 * @return ArrayList of available rooms
+	 */
 	public String getAvailableRoom(LocalDate date1, LocalDate date2, boolean type) {
 		String available = "";
 		int start = 0;
@@ -142,8 +171,16 @@ public class HotelReservationModel {
 		return available;
 	}
 
-	// reserve room using roomNumber and checkin checkout date provided
+	/**
+	 * Reserve room using roomNumber, checkIn, and Checkout date provided
+	 * @param roomNumber room being reserved
+	 * @param date1 Checkindate
+	 * @param date2 ChedkOutDate
+	 * @return true if you can book, false if otherwise
+	 */
 	public boolean reserveRoom(String roomNumber, LocalDate date1, LocalDate date2) {
+		if(date2.isBefore(date1) || date2.equals(date1))
+			return false;
 		boolean result = true;
 		TYPE type = null;
 		int number = 0;
@@ -159,6 +196,7 @@ public class HotelReservationModel {
 		number = Integer.parseInt(roomNumber.substring(type.toString().length()));
 		if(type == TYPE.LUXURY && (number < 0 || number >9)) return false;
 		if(type == TYPE.ECO && (number < 10 || number >19)) return false;
+		
 		// create a reservation
 		Reservation r = new Reservation(date1, date2, type, number, currentUser.getUsername());
 
@@ -166,10 +204,6 @@ public class HotelReservationModel {
 		result = currentUser.addReservation(r);
 		if (!result)
 			return result;
-
-		// if (type == TYPE.LUXURY)
-		// result = rooms[number - 1].addReservation(r);
-		// else
 		result = rooms[number - 1].addReservation(r);
 
 		// add this reservation of this user for this session to receipt
@@ -210,7 +244,10 @@ public class HotelReservationModel {
 
 	}
 
-	// return list of all guest(not needed for project, just for testing)
+	/**
+	 * For testing purposes
+	 * @return list of all Guests
+	 */
 	public String guestList() {
 		String line = "";
 		for (int i = 0; i < guests.size(); i++) {
@@ -219,6 +256,10 @@ public class HotelReservationModel {
 		return line;
 	}
 
+	/**
+	 * Getting list of all rooms
+	 * @return array of all rooms
+	 */
 	public String[] getRoomList() {
 		String[] list = new String[rooms.length];
 		for (int i = 0; i < rooms.length; i++) {
@@ -227,11 +268,17 @@ public class HotelReservationModel {
 		return list;
 	}
 
-	// for MVC model
+	/**
+	 * For MVC Model, attaching changeListeners
+	 * @param l ChangeListener
+	 */
 	public void attach(ChangeListener l) {
 		listeners.add(l);
 	}
 
+	/**
+	 * Updating the changeListeners in the MVC Model
+	 */
 	public void update() {
 		for (int i = 0; i < listeners.size(); i++) {
 			listeners.get(i).stateChanged(new ChangeEvent(this));
@@ -262,7 +309,7 @@ public class HotelReservationModel {
 	 *            the starting date of booking
 	 * @param endDate
 	 *            the Ending Date of the booking
-	 * @return
+	 * @return list of Booked dates regardless of User or type
 	 */
 	public String returnListOfBookedRoomsOnDate(LocalDate startDate, LocalDate endDate) {
 		String available = "Nothing!";
@@ -273,29 +320,33 @@ public class HotelReservationModel {
 					available = "";
 					count++;
 				}
-				// follow hotel.getRoomInfo for user getting
-				/**
-				 * Edit Here
-				 */
 			available += rooms[i].getRoomNumber() + "\n" + rooms[i].getUserBookedRoom() + "\n";
 			}
 		}
 		return available;
 	}
 
+	/**
+	 * Gets the roomInformation
+	 * @param roomNumber room to be checked
+	 * @return roomInformation in the form of a string
+	 */
 	public String getRoomInfo(String roomNumber) {
 		TYPE type = null;
 		int number = 0;
 		String roomType = roomNumber.substring(0, 1);
 		if (roomType.equals("L")) {
 			type = TYPE.LUXURY;
-			System.out.println("lux");
 		} else
 			type = TYPE.ECO;
 		number = Integer.parseInt(roomNumber.substring(type.toString().length()));
 		return rooms[number - 1].getRoomInfo();
 	}
 
+	/**
+	 * ManagerWriting function
+	 * @param filename writing out reservations and users to textFile
+	 */
 	public void managerWrite(String filename) {
 		try {
 			File file = new File(filename);
@@ -315,6 +366,10 @@ public class HotelReservationModel {
 		}
 	}
 
+	/**
+	 * Reading the file 
+	 * @param filename File to be read
+	 */
 	public void read(String filename) {
 		try {
 			File file = new File(filename);
@@ -364,7 +419,10 @@ public class HotelReservationModel {
 		}
 	}
 
-	// strategy for simpleReceipt
+	/**
+	 * strategy for simpleReceipt
+	 *
+	 */
 	public static class SimpleReceipt implements GetReceiptStrategy {
 		@Override
 		public String getReceipt(Guest user, ArrayList<Reservation> receipt) {
@@ -387,7 +445,10 @@ public class HotelReservationModel {
 
 	}
 
-	// strategy for comprehensive
+	/**
+	 * Strategy for comprehensive Receipt
+	 *
+	 */
 	public static class ComprehensiveReceipt implements GetReceiptStrategy {
 		@Override
 		public String getReceipt(Guest user, ArrayList<Reservation> receipt) {
@@ -402,8 +463,4 @@ public class HotelReservationModel {
 		}
 	}
 
-	// just for some debug
-	public String debug() {
-		return receipts.toString();
-	}
 }

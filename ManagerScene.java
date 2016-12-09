@@ -34,6 +34,10 @@ public class ManagerScene<Reservation> extends JFrame {
 	static GregorianCalendar cal = new GregorianCalendar();
 	private CalendarModel calendarModel;
 		
+	/**
+	 * Constructor of Manager Scene
+	 * @param hotel HotelReservation Model
+	 */
 	public ManagerScene(HotelReservationModel hotel) {
 		this.setTitle("Manager System");
 		this.hotel = hotel;
@@ -66,6 +70,7 @@ public class ManagerScene<Reservation> extends JFrame {
 		this.add(quit);
 
 		this.setSize(500, 500);
+		this.setResizable(false);
 		this.setVisible(true);
 
 	}

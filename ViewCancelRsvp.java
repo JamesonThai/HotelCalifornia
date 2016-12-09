@@ -18,8 +18,10 @@ import javax.swing.event.ChangeListener;
 import model.HotelReservationModel;
 
 /**
- * Changes model from cancel inputs and displays booked rooms from user
- * Pop-up dialog for choosing dates
+ * Changes model from cancel inputs and displays booked rooms from user Pop-up
+ * dialog for choosing dates
+ * 
+ * @author Kim Pham, Jameson Thai
  *
  */
 public class ViewCancelRsvp extends JFrame implements ChangeListener {
@@ -76,16 +78,14 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String s = cancelInput.getText();
-				if(!s.matches("^[0-9]*$") || s.equals("")){
+				if (!s.matches("^[0-9]*$") || s.equals("")) {
 					JOptionPane.showMessageDialog(ViewCancelRsvp.this, "Please enter a valid number");
-				}
-				else{
+				} else {
 					cancelInput.setText("");
 					int a = Integer.parseInt(s) - 1;
-					if(a >= 0 && a <=  hotel.returnListOfBookedRooms().size()){
+					if (a >= 0 && a <= hotel.returnListOfBookedRooms().size()) {
 						String line = hotel.returnListOfBookedRooms().get(a);
 						String[] t = line.split(",");
-						System.out.println(t[0]);
 						String[] CID = t[2].split("-");
 						String[] COD = t[3].split("-");
 						checkInDate = LocalDate.of(Integer.parseInt(CID[0]), Integer.parseInt(CID[1]),
@@ -94,9 +94,10 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 								Integer.parseInt(COD[2]));
 						hotel.cancelReservation(t[0], Integer.parseInt(t[1]), checkInDate, checkOutDate);
 						hotel.update();
-					}else{
-						JOptionPane.showMessageDialog(ViewCancelRsvp.this, "Please enter a valid number that is less than "
-								+ hotel.returnListOfBookedRooms().size());
+					} else {
+						JOptionPane.showMessageDialog(ViewCancelRsvp.this,
+								"Please enter a valid number that is less than "
+										+ hotel.returnListOfBookedRooms().size());
 					}
 				}
 			}
@@ -139,7 +140,7 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 		MainPnl.add(displayPnl, BorderLayout.EAST);
 		this.add(MainPnl, BorderLayout.SOUTH);
 		displayBookedRooms();
-
+		this.setResizable(false);
 		this.setVisible(true);
 		this.pack();
 	}
@@ -150,13 +151,11 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 	public void displayBookedRooms() {
 		String c = "No Booked Rooms!";
 		int i = 0;
-		//System.out.println("Help");
 		if (hotel.printReceipt() != null) {
 			c = "";
 			ArrayList<String> temp = hotel.returnListOfBookedRooms();
 			for (String t : temp) {
 				i++;
-			//	System.out.println("I'm here!");
 				c += i + ". " + t + "\n";
 			}
 		}
@@ -164,6 +163,9 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 	}
 
 	@Override
+	/**
+	 * Override method to stateChanged, goes to DisplayBookedRooms
+	 */
 	public void stateChanged(ChangeEvent e) {
 		// TODO Auto-generated method stub
 		displayBookedRooms();

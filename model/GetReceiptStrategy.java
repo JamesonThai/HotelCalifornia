@@ -7,7 +7,6 @@ package model;
 
 import java.util.ArrayList;
 
-//interface for print receipt strategy
 public interface GetReceiptStrategy {
   String getReceipt(Guest user, ArrayList<Reservation> receipt);
 }

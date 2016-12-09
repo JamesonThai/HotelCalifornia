@@ -3,7 +3,6 @@
  * Author: Kim Pham
  */
 
-
 import java.awt.BorderLayout;
 
 import javax.swing.JButton;
@@ -16,7 +15,7 @@ import javax.swing.JTextField;
 
 import model.HotelReservationModel;
 
-public class SignInDialog extends JDialog{
+public class SignInDialog extends JDialog {
 	JLabel nameLabel;
 	JTextField nameField;
 	JLabel idLabel;
@@ -25,8 +24,16 @@ public class SignInDialog extends JDialog{
 	HotelReservationModel model;
 	private SignUpDialog signUpDialog;
 	private JButton signUp;
-	
-	public SignInDialog(JFrame owner,HotelReservationModel model){
+
+	/**
+	 * Constructor for Sign In dialog
+	 * 
+	 * @param owner
+	 *            frame to assign which to popup
+	 * @param model
+	 *            HotelReservationModel
+	 */
+	public SignInDialog(JFrame owner, HotelReservationModel model) {
 		super(owner, "Sign Up", true);
 		this.model = model;
 		nameLabel = new JLabel("UserName");
@@ -35,7 +42,7 @@ public class SignInDialog extends JDialog{
 		idField = new JTextField(20);
 		signIn = new JButton("Sign In");
 		signUp = new JButton("New User? Sign Up");
-		
+
 		JPanel panel = new JPanel();
 		JPanel p1 = new JPanel();
 		JPanel p2 = new JPanel();
@@ -48,35 +55,35 @@ public class SignInDialog extends JDialog{
 		p3.add(signUp);
 
 		panel.setLayout(new BorderLayout());
-		panel.add(p1,BorderLayout.NORTH);
+		panel.add(p1, BorderLayout.NORTH);
 		panel.add(p2, BorderLayout.CENTER);
-		panel.add(p3,BorderLayout.SOUTH);
-		signIn.addActionListener(event->{
+		panel.add(p3, BorderLayout.SOUTH);
+		signIn.addActionListener(event -> {
 			String name = nameField.getText();
 			String num = idField.getText();
-			if(name.isEmpty() || !num.matches("^[0-9]*$") || num.equals("")){
+			if (name.isEmpty() || !num.matches("^[0-9]*$") || num.equals("")) {
 				JOptionPane.showMessageDialog(this, "Please enter valid name and Id");
-			}else{
+			} else {
 				int id = Integer.parseInt(idField.getText());
 				boolean result = model.signInGuest(name, id);
-				if(result){
+				if (result) {
 					setVisible(false);
 					owner.setVisible(true);
-				}else{
+				} else {
 					JOptionPane.showMessageDialog(owner, "User does not exsit");
 					setVisible(true);
 				}
 			}
 		});
-		
-		signUp.addActionListener(event->{
-			if(signUpDialog == null){
+
+		signUp.addActionListener(event -> {
+			if (signUpDialog == null) {
 				signUpDialog = new SignUpDialog(this, model);
 				signUpDialog.setVisible(true);
 				this.setVisible(false);
 			}
 		});
-		
+
 		this.add(panel);
 		this.pack();
 	}

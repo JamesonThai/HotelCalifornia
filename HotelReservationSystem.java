@@ -9,6 +9,10 @@ import model.HotelReservationModel;
 
 public class HotelReservationSystem {
 
+	/**
+	 * Main Method to test
+	 * @param args not used
+	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		HotelReservationModel hotel = new HotelReservationModel();
