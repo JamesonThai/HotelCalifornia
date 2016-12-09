@@ -84,16 +84,20 @@ public class ViewCancelRsvp extends JFrame implements ChangeListener {
 					cancelInput.setText("");
 					int a = Integer.parseInt(s) - 1;
 					if (a >= 0 && a <= hotel.returnListOfBookedRooms().size()) {
-						String line = hotel.returnListOfBookedRooms().get(a);
-						String[] t = line.split(",");
-						String[] CID = t[2].split("-");
-						String[] COD = t[3].split("-");
-						checkInDate = LocalDate.of(Integer.parseInt(CID[0]), Integer.parseInt(CID[1]),
-								Integer.parseInt(CID[2]));
-						checkOutDate = LocalDate.of(Integer.parseInt(COD[0]), Integer.parseInt(COD[1]),
-								Integer.parseInt(COD[2]));
-						hotel.cancelReservation(t[0], Integer.parseInt(t[1]), checkInDate, checkOutDate);
-						hotel.update();
+						if (a >= 0 && hotel.returnListOfBookedRooms().size() == 0)
+							JOptionPane.showMessageDialog(ViewCancelRsvp.this, "Nothing Left To Cancel!");
+						else {
+							String line = hotel.returnListOfBookedRooms().get(a);
+							String[] t = line.split(",");
+							String[] CID = t[2].split("-");
+							String[] COD = t[3].split("-");
+							checkInDate = LocalDate.of(Integer.parseInt(CID[0]), Integer.parseInt(CID[1]),
+									Integer.parseInt(CID[2]));
+							checkOutDate = LocalDate.of(Integer.parseInt(COD[0]), Integer.parseInt(COD[1]),
+									Integer.parseInt(COD[2]));
+							hotel.cancelReservation(t[0], Integer.parseInt(t[1]), checkInDate, checkOutDate);
+							hotel.update();
+						}
 					} else {
 						JOptionPane.showMessageDialog(ViewCancelRsvp.this,
 								"Please enter a valid number that is less than "
